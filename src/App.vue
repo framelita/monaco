@@ -2,18 +2,26 @@
   #app.app
     .app__menu 
       p Some random menu
-    .app__settings
-      p.title Settings
-      BaseSwitch(
-        name="theme"
-        label="Dark theme"
-        :is-checked="isDarkTheme"
-        @change="toggleDarkTheme"
-      )
-    .app__code
-      CodeEditor(
-        :is-dark-theme="isDarkTheme"
-      )
+    .app__code(
+      :class="{ 'is-full-screen': isFullScreen }"
+    )
+      .code__wrapper
+        .code__actions
+          BaseSwitch(
+            name="theme"
+            label="Dark theme"
+            :is-checked="isDarkTheme"
+            @change="toggleDarkTheme"
+          )
+          BaseSwitch(
+            name="full-screen"
+            label="Full screen"
+            :is-checked="isFullScreen"
+            @change="toggleFullScreen"
+          )
+        CodeEditor(
+          :is-dark-theme="isDarkTheme"
+        )
 </template>
 
 <script>
@@ -34,6 +42,7 @@ export default {
   data() {
     return {
       isDarkTheme: true,
+      isFullScreen: false,
     };
   },
   watch: {
@@ -53,6 +62,9 @@ export default {
   methods: {
     toggleDarkTheme(val) {
       this.isDarkTheme = val;
+    },
+    toggleFullScreen(val) {
+      this.isFullScreen = val;
     },
   },
 };
@@ -79,6 +91,10 @@ body {
   scroll-behavior: smooth;
   color: $lightThemeText;
 
+  .code__wrapper {
+    background: $lightThemeBg;
+  }
+
   * {
     &::-webkit-scrollbar {
       width: 7px;
@@ -99,15 +115,27 @@ body {
   &.dark-mode {
     background: $darkThemeBg;
     color: $darkThemeText;
+
+    .code__wrapper {
+      background: $darkThemeBg;
+    }
   }
 
   @include dark {
     background: $darkThemeBg;
     color: $darkThemeText;
 
+    .code__wrapper {
+      background: $darkThemeBg;
+    }
+
     &.light-mode {
       background: $lightThemeBg;
       color: $lightThemeText;
+
+      .code__wrapper {
+        background: $lightThemeBg;
+      }
     }
   }
 }
@@ -142,6 +170,7 @@ button {
 .app {
   display: flex;
   align-content: stretch;
+  height: 600px;
 
   &.is-dark {
     background: $darkGrey900;
@@ -153,22 +182,52 @@ button {
   font-size: 1.125rem;
 }
 
-.app__menu,
-.app__settings {
+.app__menu {
   width: 200px;
   flex: 1 0 auto;
   padding: 15px;
 }
 
 .app__menu,
-.app__settings,
 .app__code {
   border: 1px solid $darkGrey400;
   border-right: 0;
 }
 
 .app__code {
-  width: calc(100% - 400px);
-  padding: 15px 0;
+  width: calc(100% - 200px);
+  padding: 0;
+
+  .code__wrapper {
+    height: 100%;
+  }
+
+  .code-editor {
+    height: calc(100% - 50px);
+  }
+
+  .code__actions {
+    padding: 10px;
+    background: rgba(128, 128, 128, 0.2);
+    margin-bottom: 10px;
+    height: 40px;
+
+    .base-switch {
+      display: inline-block;
+      margin-right: 20px;
+      min-width: 160px;
+    }
+  }
+
+  &.is-full-screen {
+    .code__wrapper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 99;
+    }
+  }
 }
 </style>

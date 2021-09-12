@@ -41,6 +41,7 @@ export default {
       value: this.jsCode,
       language: 'javascript',
       theme: this.theme,
+      automaticLayout: true,
     });
 
     console.log('monaco.languages', monaco.languages);
