@@ -1,7 +1,16 @@
 <template lang="pug">
   #app.app
     .app__menu 
-      p Some random menu
+      ul.menu__list
+        li.menu__item(
+          v-for="(file, index) in files"
+          :key="file.name"
+        )
+          button.menu__button(
+            :class="{ 'is-active': index === activeFileIndex }"
+            type="button"
+            @click="changeActiveFileIndex(index)"
+          ) {{ file.name }}
     .app__code(
       :class="{ 'is-full-screen': isFullScreen }"
     )
@@ -21,6 +30,8 @@
           )
         CodeEditor(
           :is-dark-theme="isDarkTheme"
+          :file-index="activeFileIndex"
+          :value="activeValue"
         )
 </template>
 
@@ -43,7 +54,23 @@ export default {
     return {
       isDarkTheme: true,
       isFullScreen: false,
+      activeFileIndex: 0,
+      files: [
+        {
+          name: 'SampleFile1',
+          content: "function hello() {\n\talert('Hello world!');\n}",
+        },
+        {
+          name: 'SampleFile2',
+          content: "function someEvent() {\n\talert('Hello world!');\n}",
+        },
+      ],
     };
+  },
+  computed: {
+    activeValue() {
+      return this.files[this.activeFileIndex].content;
+    },
   },
   watch: {
     isDarkTheme(val) {
@@ -80,6 +107,9 @@ export default {
         this.$cookie.set('theme', 'light');
       }
       console.log('?', this.$cookie.get('theme'));
+    },
+    changeActiveFileIndex(index) {
+      this.activeFileIndex = index;
     },
   },
 };
@@ -145,6 +175,11 @@ button {
   border: 0;
   cursor: pointer;
   background: transparent;
+  color: $lightThemeText;
+
+  .dark-mode & {
+    color: $darkThemeText;
+  }
 
   &:active,
   &:hover,
@@ -183,6 +218,23 @@ button {
   width: 200px;
   flex: 1 0 auto;
   padding: 15px;
+
+  .menu__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .menu__item {
+    padding: 0;
+    margin-bottom: 5px;
+  }
+
+  .menu__button {
+    &.is-active {
+      color: $green;
+    }
+  }
 }
 
 .app__menu,
