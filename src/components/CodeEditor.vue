@@ -5,6 +5,7 @@
 </template>
 
 <script>
+import 'monaco-editor/esm/vs/editor/editor.main.js';
 import * as monaco from 'monaco-editor/esm/vs/editor/editor.api';
 
 export default {
@@ -17,33 +18,39 @@ export default {
       jsCode: "function hello() {\n\talert('Hello world!');\n}",
     };
   },
+  computed: {
+    theme() {
+      return this.isDarkTheme ? 'vs-dark' : 'vs-light';
+    },
+  },
   mounted() {
     // validation settings
-    // monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
-    //     noSemanticValidation: true,
-    //     noSyntaxValidation: false
-    // });
+    monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
+      noSemanticValidation: true,
+      noSyntaxValidation: false,
+    });
 
-    // // compiler options
-    // monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
-    //     target: monaco.languages.typescript.ScriptTarget.ES6,
-    //     allowNonTsExtensions: true,
-    //     allowJs: true
-    // });
+    // compiler options
+    monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+      target: monaco.languages.typescript.ScriptTarget.ES6,
+      allowNonTsExtensions: true,
+      allowJs: true,
+    });
 
     monaco.editor.create(this.$refs.editor, {
       value: this.jsCode,
       language: 'javascript',
-      theme: 'vs-light',
+      theme: this.theme,
     });
 
-    console.log('monaco.languages');
+    console.log('monaco.languages', monaco.languages);
   },
   watch: {
-    isDarkTheme(val) {
-      const theme = val ? 'vs-dark' : 'vs-light';
-
-      monaco.editor.setTheme(theme);
+    isDarkTheme: {
+      handler() {
+        monaco.editor.setTheme(this.theme);
+      },
+      immediate: true,
     },
   },
 };
