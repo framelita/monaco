@@ -46,18 +46,21 @@ export default {
     };
   },
   watch: {
-    isDarkTheme: {
-      handler(val) {
-        if (val) {
-          document.body.classList.add('dark-mode');
-          document.body.classList.remove('light-mode');
-        } else {
-          document.body.classList.remove('dark-mode');
-          document.body.classList.add('light-mode');
-        }
-      },
-      immediate: true,
+    isDarkTheme(val) {
+      this.updateDarkTheme(val);
     },
+  },
+  mounted() {
+    const matchedDark = window.matchMedia('(prefers-color-scheme: dark)')
+      .matches;
+
+    if (this.$cookie.get('theme')) {
+      this.isDarkTheme = this.$cookie.get('theme') === 'dark';
+    } else {
+      this.isDarkTheme = !!matchedDark;
+    }
+    // can't use immediate because it will always set to dark
+    this.updateDarkTheme(this.isDarkTheme);
   },
   methods: {
     toggleDarkTheme(val) {
@@ -65,6 +68,18 @@ export default {
     },
     toggleFullScreen(val) {
       this.isFullScreen = val;
+    },
+    updateDarkTheme(val) {
+      if (val) {
+        document.body.classList.add('dark-mode');
+        document.body.classList.remove('light-mode');
+        this.$cookie.set('theme', 'dark');
+      } else {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+        this.$cookie.set('theme', 'light');
+      }
+      console.log('?', this.$cookie.get('theme'));
     },
   },
 };
@@ -118,24 +133,6 @@ body {
 
     .code__wrapper {
       background: $darkThemeBg;
-    }
-  }
-
-  @include dark {
-    background: $darkThemeBg;
-    color: $darkThemeText;
-
-    .code__wrapper {
-      background: $darkThemeBg;
-    }
-
-    &.light-mode {
-      background: $lightThemeBg;
-      color: $lightThemeText;
-
-      .code__wrapper {
-        background: $lightThemeBg;
-      }
     }
   }
 }
